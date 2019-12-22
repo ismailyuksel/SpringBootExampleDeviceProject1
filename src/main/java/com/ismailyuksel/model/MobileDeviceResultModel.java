@@ -6,7 +6,7 @@ public class MobileDeviceResultModel {
 
 	private boolean success;
 	private String error;
-	List<MobileDevice> mobileDeviceList;
+	List<MobileDeviceModel> mobileDeviceList;
 	
 	public boolean isSuccess() {
 		return success;
@@ -20,10 +20,10 @@ public class MobileDeviceResultModel {
 	public void setError(String error) {
 		this.error = error;
 	}
-	public List<MobileDevice> getMobileDeviceList() {
+	public List<MobileDeviceModel> getMobileDeviceList() {
 		return mobileDeviceList;
 	}
-	public void setMobileDeviceList(List<MobileDevice> mobileDeviceList) {
+	public void setMobileDeviceList(List<MobileDeviceModel> mobileDeviceList) {
 		this.mobileDeviceList = mobileDeviceList;
 	}
 	

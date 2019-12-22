@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.ismailyuksel.model.MobileDevice;
+import com.ismailyuksel.model.MobileDeviceModel;
 import com.ismailyuksel.model.OsType;
 import com.ismailyuksel.service.H2JdbcService;
 import com.ismailyuksel.util.JsonUtil;
@@ -48,9 +48,9 @@ public class ImportDeviceController {
 			return ERROR_RESULT;
 		}
 		
-		List<MobileDevice> mobileDeviceList = null;
+		List<MobileDeviceModel> mobileDeviceList = null;
 		try {
-			TypeToken<List<MobileDevice>> token = new TypeToken<List<MobileDevice>>(){};
+			TypeToken<List<MobileDeviceModel>> token = new TypeToken<List<MobileDeviceModel>>(){};
 			mobileDeviceList = gson.fromJson(json, token.getType());
 		} catch (JsonSyntaxException e) {
 			logger.error("importMobileDevice:jsonParseError json: " + json, e);
@@ -76,9 +76,9 @@ public class ImportDeviceController {
 		return IdsList.size() + " mobile device info imported. Imported Ids: " + gson.toJson(IdsList);
     }
 
-	private List<Integer> insertDevices(List<MobileDevice> mobileDeviceList) {
+	private List<Integer> insertDevices(List<MobileDeviceModel> mobileDeviceList) {
 		List<Integer> IdsList = new ArrayList<>();
-		for(MobileDevice mobileDevice: mobileDeviceList) {
+		for(MobileDeviceModel mobileDevice: mobileDeviceList) {
 			int id = 0;
 			try {
 				id = h2JdbcService.addMobileDevice(mobileDevice);
@@ -98,9 +98,9 @@ public class ImportDeviceController {
 		return IdsList;
 	}
 
-	private void removeInvalidDeviceInfo(List<MobileDevice> mobileDeviceList) {
+	private void removeInvalidDeviceInfo(List<MobileDeviceModel> mobileDeviceList) {
 		
-		List<MobileDevice> invalidMobileDeviceList = mobileDeviceList.stream()
+		List<MobileDeviceModel> invalidMobileDeviceList = mobileDeviceList.stream()
 				.filter(a -> StringUtils.isNullOrEmpty(a.getBrand()) || StringUtils.isNullOrEmpty(a.getModel())
 						|| StringUtils.isNullOrEmpty(a.getOs()) || StringUtils.isNullOrEmpty(a.getOsVersion())
 						|| (!a.getOs().equals(OsType.ANDROID.getValue()) && !a.getOs().equals(OsType.IOS.getValue())))
@@ -108,7 +108,7 @@ public class ImportDeviceController {
 		
 		if (invalidMobileDeviceList != null && !invalidMobileDeviceList.isEmpty()) {
 			logger.warn("importMobileDevice:invalidDeviceList: " + gson.toJson(invalidMobileDeviceList));
-			for (MobileDevice invalidMobileDevice : invalidMobileDeviceList) {
+			for (MobileDeviceModel invalidMobileDevice : invalidMobileDeviceList) {
 				mobileDeviceList.removeIf(a -> a.equals(invalidMobileDevice));
 			}
 		}

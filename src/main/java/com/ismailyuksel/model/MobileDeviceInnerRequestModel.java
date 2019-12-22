@@ -1,7 +1,6 @@
 package com.ismailyuksel.model;
 
-public class MobileDevice {
-
+public class MobileDeviceInnerRequestModel {
 	private int id;
 	private String brand;
 	private String model;
@@ -44,5 +43,4 @@ public class MobileDevice {
 		return "MobileDevice [id=" + id + ", brand=" + brand + ", model=" + model + ", os=" + os + ", osVersion="
 				+ osVersion + "]";
 	}
-	
 }

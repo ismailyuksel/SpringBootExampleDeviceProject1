@@ -4,12 +4,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
-import com.ismailyuksel.model.MobileDevice;
+import com.ismailyuksel.model.MobileDeviceModel;
 
-public class MobileDeviceRowMapper implements RowMapper<MobileDevice> {
+public class MobileDeviceModelRowMapper implements RowMapper<MobileDeviceModel> {
 	@Override
-    public MobileDevice mapRow(ResultSet rs, int rowNum) throws SQLException {
-		MobileDevice mobileDevice = new MobileDevice();
+    public MobileDeviceModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+		MobileDeviceModel mobileDevice = new MobileDeviceModel();
 		mobileDevice.setId(rs.getInt("id"));
 		mobileDevice.setBrand(rs.getString("brand"));
 		mobileDevice.setModel(rs.getString("model"));
