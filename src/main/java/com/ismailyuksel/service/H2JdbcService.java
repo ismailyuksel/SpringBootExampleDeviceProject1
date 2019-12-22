@@ -3,6 +3,7 @@ package com.ismailyuksel.service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import com.ismailyuksel.model.MobileDevice;
+import com.ismailyuksel.rowmapper.MobileDeviceRowMapper;
 
 @Service
 public class H2JdbcService {
@@ -40,5 +42,9 @@ public class H2JdbcService {
 		
 		return keyHolder.getKey().intValue();
 	}
+	
+    public List<MobileDevice> getMobileDevice() throws Exception {
+    	return jdbcTemplate.query("select id, brand, model, os, os_version from mobile_device", new MobileDeviceRowMapper());
+    }
 
 }

@@ -2,6 +2,7 @@ package com.ismailyuksel.model;
 
 public class MobileDevice {
 
+	private int id;
 	private String brand;
 	private String model;
 	private String os;
@@ -31,10 +32,17 @@ public class MobileDevice {
 	public void setOs(String os) {
 		this.os = os;
 	}
-	@Override
-	public String toString() {
-		return "MobileDevice [brand=" + brand + ", model=" + model + ", os=" + os + ", osVersion=" + osVersion + "]";
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
+	@Override
+	public String toString() {
+		return "MobileDevice [id=" + id + ", brand=" + brand + ", model=" + model + ", os=" + os + ", osVersion="
+				+ osVersion + "]";
+	}
 	
 }
