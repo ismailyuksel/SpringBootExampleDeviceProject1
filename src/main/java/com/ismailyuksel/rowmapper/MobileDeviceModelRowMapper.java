@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 import com.ismailyuksel.model.MobileDeviceModel;
+import com.ismailyuksel.model.OsType;
 
 public class MobileDeviceModelRowMapper implements RowMapper<MobileDeviceModel> {
 	@Override
@@ -13,7 +14,7 @@ public class MobileDeviceModelRowMapper implements RowMapper<MobileDeviceModel> 
 		mobileDevice.setId(rs.getInt("id"));
 		mobileDevice.setBrand(rs.getString("brand"));
 		mobileDevice.setModel(rs.getString("model"));
-		mobileDevice.setOs(rs.getString("os"));
+		mobileDevice.setOs(OsType.of(rs.getInt("os")).toString());
 		mobileDevice.setOsVersion(rs.getString("os_version"));
         return mobileDevice;
     }

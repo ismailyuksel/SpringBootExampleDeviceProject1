@@ -11,11 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.ismailyuksel.model.ErrorModel;
+import com.ismailyuksel.model.ErrorType;
+import com.ismailyuksel.model.MobileDeviceImportResultModel;
 import com.ismailyuksel.model.MobileDeviceModel;
 import com.ismailyuksel.model.OsType;
 import com.ismailyuksel.service.H2JdbcService;
@@ -35,17 +39,16 @@ public class ImportDeviceController {
 	@Autowired
 	private H2JdbcService h2JdbcService;
 	
-	private static final String ERROR_RESULT = "Mobile device info could not imported";
-	
     @GetMapping("/import/device")
-    public String importMobileDevice()  {
+    public @ResponseBody MobileDeviceImportResultModel importMobileDevice()  {
     	
     	String json = null;
 		try {
 			json = JsonUtil.readJsonFromUrl(deviceUrl);
 		} catch (IOException e) {
-			logger.error("importMobileDevice:error url: " + deviceUrl, e);
-			return ERROR_RESULT;
+			ErrorModel error = new ErrorModel(1, ErrorType.IMPORT);
+			logger.error(error.toString() + " url: " + deviceUrl, e);
+			return getResult(false, error.getErrorCode() ,error.getErrorDescription(), null);
 		}
 		
 		List<MobileDeviceModel> mobileDeviceList = null;
@@ -53,28 +56,45 @@ public class ImportDeviceController {
 			TypeToken<List<MobileDeviceModel>> token = new TypeToken<List<MobileDeviceModel>>(){};
 			mobileDeviceList = gson.fromJson(json, token.getType());
 		} catch (JsonSyntaxException e) {
-			logger.error("importMobileDevice:jsonParseError json: " + json, e);
-			return ERROR_RESULT;
+			ErrorModel error = new ErrorModel(2, ErrorType.IMPORT);
+			logger.error(error.toString() + " json: " + json, e);
+			return getResult(false, error.getErrorCode() ,error.getErrorDescription(), null);
 		}
 		
 		if(mobileDeviceList == null || mobileDeviceList.isEmpty()) {
-			logger.error("importMobileDevice:nullOrEmptyError mobileDeviceList");
-			return ERROR_RESULT;
+			ErrorModel error = new ErrorModel(3, ErrorType.IMPORT);
+			logger.error(error.toString());
+			return getResult(false, error.getErrorCode() ,error.getErrorDescription(), null);
 		}
 		
 		removeInvalidDeviceInfo(mobileDeviceList);
 		
 		if(mobileDeviceList.isEmpty()) {
-			logger.error("importMobileDevice:mobileDeviceList is invalid");
-			return ERROR_RESULT;
+			ErrorModel error = new ErrorModel(4, ErrorType.IMPORT);
+			logger.error(error.toString());
+			return getResult(false, error.getErrorCode() ,error.getErrorDescription(), null);
 		}
 		
 		List<Integer> IdsList = insertDevices(mobileDeviceList);
         if(IdsList.size() == 0) {
-        	return "Mobile devices already imported";
+        	ErrorModel error = new ErrorModel(5, ErrorType.IMPORT);
+        	logger.warn(error.toString());
+        	return getResult(true, null ,error.getErrorDescription(), null);
         }
-		return IdsList.size() + " mobile device info imported. Imported Ids: " + gson.toJson(IdsList);
+        return getResult(true, null, IdsList.size() + " mobile device info imported", IdsList);
     }
+
+	private MobileDeviceImportResultModel getResult(boolean success, String errorCode, String result, List<Integer> IdsList) {
+		if(IdsList == null) {
+			IdsList = new ArrayList<>();
+		}
+		MobileDeviceImportResultModel resultModel = new MobileDeviceImportResultModel();
+		resultModel.setSuccess(success);
+		resultModel.setErrorCode(errorCode);
+		resultModel.setResult(result);
+		resultModel.setIdsList(IdsList);
+		return resultModel;
+	}
 
 	private List<Integer> insertDevices(List<MobileDeviceModel> mobileDeviceList) {
 		List<Integer> IdsList = new ArrayList<>();
@@ -103,7 +123,7 @@ public class ImportDeviceController {
 		List<MobileDeviceModel> invalidMobileDeviceList = mobileDeviceList.stream()
 				.filter(a -> StringUtils.isNullOrEmpty(a.getBrand()) || StringUtils.isNullOrEmpty(a.getModel())
 						|| StringUtils.isNullOrEmpty(a.getOs()) || StringUtils.isNullOrEmpty(a.getOsVersion())
-						|| (!a.getOs().equals(OsType.ANDROID.getValue()) && !a.getOs().equals(OsType.IOS.getValue())))
+						|| (!a.getOs().equals(OsType.ANDROID.toString()) && !a.getOs().equals(OsType.IOS.toString())))
 				.collect(Collectors.toList());
 		
 		if (invalidMobileDeviceList != null && !invalidMobileDeviceList.isEmpty()) {
@@ -114,6 +134,5 @@ public class ImportDeviceController {
 		}
 	
 	}
-
 
 }

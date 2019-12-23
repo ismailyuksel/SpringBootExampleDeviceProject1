@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ismailyuksel.model.MobileDeviceInnerRequestModel;
+import com.ismailyuksel.model.MobileDeviceSearchInnerRequestModel;
+import com.ismailyuksel.model.ErrorModel;
+import com.ismailyuksel.model.ErrorType;
 import com.ismailyuksel.model.MobileDeviceModel;
-import com.ismailyuksel.model.MobileDeviceResultModel;
+import com.ismailyuksel.model.MobileDeviceSearchResultModel;
 import com.ismailyuksel.service.H2JdbcService;
 
 @RestController
@@ -24,39 +26,34 @@ public class SearchDeviceController {
 	private H2JdbcService h2JdbcService;
 
 	@GetMapping("/search/device")
-	public @ResponseBody MobileDeviceResultModel searchMobileDevice(
+	public @ResponseBody MobileDeviceSearchResultModel searchMobileDevice(
 			 @RequestParam(value = "id", required = false, defaultValue = "0") int id,
 			 @RequestParam(value = "brand", required = false) String brand,
 			 @RequestParam(value = "model", required = false) String model,
 			 @RequestParam(value = "os", required = false) String os,
 			 @RequestParam(value = "osVersion", required = false) String osVersion)  {
 		
-    	MobileDeviceResultModel result = new MobileDeviceResultModel();
-    	
-    	MobileDeviceInnerRequestModel mobileDeviceInnerRequest = getMobileDeviceInnerRequest(id, brand, model, os, osVersion);
+    	MobileDeviceSearchInnerRequestModel mobileDeviceInnerRequest = getMobileDeviceInnerRequest(id, brand, model, os, osVersion);
     	
     	List<MobileDeviceModel> mobileDeviceList = new ArrayList<>();
 		try {
 			mobileDeviceList = h2JdbcService.getMobileDevice(mobileDeviceInnerRequest);
 		} catch (Exception e) {
-			logger.error("searchMobileDevice:sqlError requestParameters: " + mobileDeviceInnerRequest.toString(), e);
-			return getErrorResult(result, "Sql exception occured");
+			ErrorModel error = new ErrorModel(1, ErrorType.SEARCH);
+			logger.error(error.toString() + " requestParameters: " + mobileDeviceInnerRequest.toString(), e);
+			return getResult(false, error.getErrorCode(), error.getErrorDescription(), null);
 		}
 		if(mobileDeviceList == null || mobileDeviceList.isEmpty()) {
-			logger.warn("searchMobileDevice:emptyResult requestParameters: " + mobileDeviceInnerRequest.toString());
-			return getErrorResult(result, "Empty result");
+			ErrorModel error = new ErrorModel(2, ErrorType.SEARCH);
+			logger.warn(error.toString() + " requestParameters: " + mobileDeviceInnerRequest.toString());
+			return getResult(false, error.getErrorCode(), error.getErrorDescription(), null);
 		}
-		
-    	result.setSuccess(true);
-    	result.setMobileDeviceList(mobileDeviceList);
-    	
-		return result;
-
+		return getResult(true, null, mobileDeviceList.size() + " mobile device found.", mobileDeviceList);
     }
 
-	private MobileDeviceInnerRequestModel getMobileDeviceInnerRequest(int id, String brand, String model, String os,
+	private MobileDeviceSearchInnerRequestModel getMobileDeviceInnerRequest(int id, String brand, String model, String os,
 			String osVersion) {
-		MobileDeviceInnerRequestModel mobileDeviceInnerRequest = new MobileDeviceInnerRequestModel();
+		MobileDeviceSearchInnerRequestModel mobileDeviceInnerRequest = new MobileDeviceSearchInnerRequestModel();
     	mobileDeviceInnerRequest.setId(id);
     	mobileDeviceInnerRequest.setBrand(brand);
     	mobileDeviceInnerRequest.setModel(model);
@@ -65,11 +62,15 @@ public class SearchDeviceController {
 		return mobileDeviceInnerRequest;
 	}
 
-	private MobileDeviceResultModel getErrorResult(MobileDeviceResultModel result, String error) {
-		result = new MobileDeviceResultModel();
-		result.setSuccess(false);
-		result.setError(error);
-		result.setMobileDeviceList(new ArrayList<MobileDeviceModel>());
-		return result;
+	private MobileDeviceSearchResultModel getResult(boolean success, String errorCode, String result, List<MobileDeviceModel> mobileDeviceList) {
+		if(mobileDeviceList == null) {
+			mobileDeviceList = new ArrayList<>();
+		}
+		MobileDeviceSearchResultModel searchResult = new MobileDeviceSearchResultModel();
+		searchResult.setSuccess(success);
+		searchResult.setErrorCode(errorCode);
+		searchResult.setResult(result);
+		searchResult.setMobileDeviceList(mobileDeviceList);
+		return searchResult;
 	}
 }

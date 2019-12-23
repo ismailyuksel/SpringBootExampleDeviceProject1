@@ -1,6 +1,6 @@
 package com.ismailyuksel.model;
 
-public class MobileDeviceInnerRequestModel {
+public class MobileDeviceSearchInnerRequestModel {
 	private int id;
 	private String brand;
 	private String model;

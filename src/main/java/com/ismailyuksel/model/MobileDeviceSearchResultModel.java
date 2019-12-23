@@ -2,10 +2,11 @@ package com.ismailyuksel.model;
 
 import java.util.List;
 
-public class MobileDeviceResultModel {
+public class MobileDeviceSearchResultModel {
 
 	private boolean success;
-	private String error;
+	private String errorCode;
+	private String result;
 	List<MobileDeviceModel> mobileDeviceList;
 	
 	public boolean isSuccess() {
@@ -14,17 +15,23 @@ public class MobileDeviceResultModel {
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
-	public String getError() {
-		return error;
-	}
-	public void setError(String error) {
-		this.error = error;
-	}
 	public List<MobileDeviceModel> getMobileDeviceList() {
 		return mobileDeviceList;
 	}
 	public void setMobileDeviceList(List<MobileDeviceModel> mobileDeviceList) {
 		this.mobileDeviceList = mobileDeviceList;
+	}
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getResult() {
+		return result;
+	}
+	public void setResult(String result) {
+		this.result = result;
 	}
 	
 }

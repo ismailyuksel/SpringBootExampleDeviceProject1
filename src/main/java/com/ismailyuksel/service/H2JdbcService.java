@@ -14,7 +14,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
-import com.ismailyuksel.model.MobileDeviceInnerRequestModel;
+import com.ismailyuksel.model.MobileDeviceSearchInnerRequestModel;
+import com.ismailyuksel.model.OsType;
 import com.ismailyuksel.model.MobileDeviceModel;
 import com.ismailyuksel.rowmapper.MobileDeviceModelRowMapper;
 
@@ -36,7 +37,7 @@ public class H2JdbcService {
 		                connection.prepareStatement(MOBILE_DEVICE_INSERT_SQL, new String[] {"id"});
 					ps.setString(1, mobileDevice.getBrand());
 					ps.setString(2, mobileDevice.getModel());
-					ps.setString(3, mobileDevice.getOs());
+					ps.setInt(3, OsType.ofName(mobileDevice.getOs()).getValue());
 					ps.setString(4, mobileDevice.getOsVersion());
 		            return ps;
 		        }
@@ -46,7 +47,7 @@ public class H2JdbcService {
 		return keyHolder.getKey().intValue();
 	}
 	
-    public List<MobileDeviceModel> getMobileDevice(MobileDeviceInnerRequestModel mobileDeviceInnerRequest) throws Exception {
+    public List<MobileDeviceModel> getMobileDevice(MobileDeviceSearchInnerRequestModel mobileDeviceInnerRequest) throws Exception {
     	List<String> paramList = new ArrayList<>();
     	String dynamicSql = getDynamicSql(mobileDeviceInnerRequest, paramList);
     	return getMobileDeviceList(paramList, dynamicSql);
@@ -64,7 +65,7 @@ public class H2JdbcService {
 		return mobileDevice;
 	}
 
-	private String getDynamicSql(MobileDeviceInnerRequestModel mobileDeviceInnerRequest, List<String> paramList) {
+	private String getDynamicSql(MobileDeviceSearchInnerRequestModel mobileDeviceInnerRequest, List<String> paramList) {
 		String dynamicSql = MOBILE_DEVICE_SELECT_SQL;
     	if(mobileDeviceInnerRequest.getId() != 0) {
     		dynamicSql += " and id = ?";
