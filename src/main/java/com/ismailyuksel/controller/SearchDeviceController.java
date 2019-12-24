@@ -2,6 +2,8 @@ package com.ismailyuksel.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import com.ismailyuksel.model.ErrorModel;
 import com.ismailyuksel.model.ErrorType;
 import com.ismailyuksel.model.MobileDeviceModel;
 import com.ismailyuksel.model.MobileDeviceSearchResultModel;
+import com.ismailyuksel.model.OsType;
 import com.ismailyuksel.service.H2JdbcService;
 
 @RestController
@@ -46,7 +49,7 @@ public class SearchDeviceController {
 		if(mobileDeviceList == null || mobileDeviceList.isEmpty()) {
 			ErrorModel error = new ErrorModel(2, ErrorType.SEARCH);
 			logger.warn(error.toString() + " requestParameters: " + mobileDeviceInnerRequest.toString());
-			return getResult(false, error.getErrorCode(), error.getErrorDescription(), null);
+			return getResult(true, null, error.getErrorDescription(), null);
 		}
 		return getResult(true, null, mobileDeviceList.size() + " mobile device found.", mobileDeviceList);
     }
@@ -57,7 +60,9 @@ public class SearchDeviceController {
     	mobileDeviceInnerRequest.setId(id);
     	mobileDeviceInnerRequest.setBrand(brand);
     	mobileDeviceInnerRequest.setModel(model);
-    	mobileDeviceInnerRequest.setOs(os);
+    	if(!StringUtils.isNullOrEmpty(os)) {
+    		mobileDeviceInnerRequest.setOsType(OsType.ofName(os));
+    	}
     	mobileDeviceInnerRequest.setOsVersion(osVersion);
 		return mobileDeviceInnerRequest;
 	}

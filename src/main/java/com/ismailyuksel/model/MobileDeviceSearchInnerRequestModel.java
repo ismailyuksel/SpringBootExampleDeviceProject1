@@ -4,7 +4,7 @@ public class MobileDeviceSearchInnerRequestModel {
 	private int id;
 	private String brand;
 	private String model;
-	private String os;
+	private OsType osType;
 	private String osVersion;
 	
 	public String getOsVersion() {
@@ -25,22 +25,23 @@ public class MobileDeviceSearchInnerRequestModel {
 	public void setModel(String model) {
 		this.model = model;
 	}
-	public String getOs() {
-		return os;
-	}
-	public void setOs(String os) {
-		this.os = os;
-	}
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
+	public OsType getOsType() {
+		return osType;
+	}
+	public void setOsType(OsType osType) {
+		this.osType = osType;
+	}
 	
 	@Override
 	public String toString() {
-		return "MobileDevice [id=" + id + ", brand=" + brand + ", model=" + model + ", os=" + os + ", osVersion="
-				+ osVersion + "]";
+		return "MobileDeviceSearchInnerRequestModel [id=" + id + ", brand=" + brand + ", model=" + model + ", osType="
+				+ osType + ", osVersion=" + osVersion + "]";
 	}
+
 }

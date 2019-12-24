@@ -79,9 +79,9 @@ public class H2JdbcService {
     		dynamicSql += " and model = ?";
     		paramList.add(mobileDeviceInnerRequest.getModel());
     	}
-    	if(!StringUtils.isNullOrEmpty(mobileDeviceInnerRequest.getOs())) {
+    	if(mobileDeviceInnerRequest.getOsType() != null) {
     		dynamicSql += " and os = ?";
-    		paramList.add(mobileDeviceInnerRequest.getOs());
+    		paramList.add(String.valueOf(mobileDeviceInnerRequest.getOsType().getValue()));
     	}
     	if(!StringUtils.isNullOrEmpty(mobileDeviceInnerRequest.getOsVersion())) {
     		dynamicSql += " and os_version = ?";
